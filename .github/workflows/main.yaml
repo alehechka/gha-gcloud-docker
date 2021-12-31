@@ -1,0 +1,22 @@
+name: Test gha-gcloud-docker
+on:
+  push:
+    branches:
+      - 'feature/*'
+
+jobs:
+  last_pass:
+    runs-on: ubuntu-latest
+    name: Test gha-gcloud-docker
+    steps:
+      - name: Test gha-gcloud-docker
+        id: secrets
+        uses: alehechka/gha-gcloud-docker@feature/create
+        with:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          secrets: DEVELOP_KEY, PROD_KEY
+
+      - name: Print Outputs
+        run: |
+          echo "DEVELOP_KEY=${{ steps.secrets.outputs.DEVELOP_KEY }}"
+          echo "PROD_KEY=${{ steps.secrets.outputs.PROD_KEY }}"
