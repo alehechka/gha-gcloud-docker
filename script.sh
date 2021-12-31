@@ -2,7 +2,6 @@
 
 GCP_SA_KEY=$1
 KEYS=$2
-GITHUB_EVENT_CONTEXT=$3
 
 echo "Authenticating Service Account with gcloud..."
 mkdir -p /tmp/certs
@@ -25,4 +24,4 @@ do
     echo "::set-output name=$KEY::$SECRET"
 done
 
-echo "$GITHUB_EVENT_CONTEXT"
+env | sort

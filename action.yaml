@@ -16,4 +16,3 @@ runs:
   args:
     - ${{ inputs.GCP_SA_KEY }}
     - ${{ inputs.secrets }}
-    - ${{ toJSON(github.event) }}
