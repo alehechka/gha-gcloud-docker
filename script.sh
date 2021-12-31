@@ -14,6 +14,7 @@ do
     echo "Retrieving secret for: $KEY"
 
     SECRET=$(gcloud secrets versions access latest --secret="$KEY" --format='get(payload.data)' | tr '_-' '/+' | base64 -d)
+    echo "exit code: $?"
     # echo "::add-mask::$SECRET"
 
     echo "::set-output name=$KEY::$SECRET"
