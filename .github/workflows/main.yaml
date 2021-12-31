@@ -1,6 +1,7 @@
 name: Test gha-gcloud-docker
 on:
   - push
+  - pull_request
 
 jobs:
   secret_manager:
