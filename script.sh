@@ -13,7 +13,7 @@ for KEY in ${KEYS//,/ }
 do
     echo "Retrieving secret for: $KEY"
 
-    SECRET=$(gcloud secrets versions access latest --secret="DEVELOP_KEY" --format='get(payload.data)' | tr '_-' '/+' | base64 -d)
+    SECRET=$(gcloud secrets versions access latest --secret="$KEY" --format='get(payload.data)' | tr '_-' '/+' | base64 -d)
     # echo "::add-mask::$SECRET"
 
     echo "::set-output name=$KEY::$SECRET"
