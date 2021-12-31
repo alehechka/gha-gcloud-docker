@@ -15,7 +15,7 @@ jobs:
           secrets: DEVELOP_KEY, PROD_KEY
 
       - name: Print Outputs
-        # if: always()
+        if: always()
         run: |
           echo "DEVELOP_KEY=${{ steps.secrets.outputs.DEVELOP_KEY }}"
           echo "PROD_KEY=${{ steps.secrets.outputs.PROD_KEY }}"
