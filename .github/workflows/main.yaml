@@ -1,11 +1,9 @@
 name: Test gha-gcloud-docker
 on:
-  push:
-    branches:
-      - 'feature/*'
+  - push
 
 jobs:
-  last_pass:
+  secret_manager:
     runs-on: ubuntu-latest
     name: Test gha-gcloud-docker
     steps:
