@@ -13,9 +13,12 @@ for KEY in ${KEYS//,/ }
 do
     echo "Retrieving secret for: $KEY"
 
-    gcloud secrets list --filter="name:$KEY"
-
     SECRET=$(gcloud secrets versions access latest --secret="$KEY" --format='get(payload.data)' | tr '_-' '/+' | base64 -d)
+
+    if [ -z "$SECRET" ]; then
+        exit 1
+    fi
+
     # echo "::add-mask::$SECRET"
 
     echo "::set-output name=$KEY::$SECRET"
