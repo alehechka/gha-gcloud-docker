@@ -3,7 +3,7 @@
 GCP_SA_KEY=$1
 PROJECT_ID=$(echo "$GCP_SA_KEY" | jq -r '.project_id')
 KEYS=$2
-PREFIX=$(env_prefixer.sh "$GITHUB_ACTION_REF" "$GITHUB_REF_TYPE")
+PREFIX=$(./env_prefixer.sh "$GITHUB_ACTION_REF" "$GITHUB_REF_TYPE")
 
 echo "Authenticating Service Account with gcloud..."
 mkdir -p /tmp/certs
