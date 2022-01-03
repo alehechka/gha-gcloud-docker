@@ -7,7 +7,7 @@ function main() {
 
     # get_secrets "$INPUT_SECRETS"
 
-    if [ $(get_tag_parent "v0.0.3") ]; then
+    if [[ $(get_tag_parent "v0.0.3") ]]; then
         echo "true"
     else
         echo "false"
