@@ -12,6 +12,8 @@ jobs:
         uses: alehechka/gha-gcloud-docker@feature/create
         with:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GHA_ACCESS_USER: ${{ secrets.GHA_ACCESS_USER }}
+          GHA_ACCESS_TOKEN: ${{ secrets.GHA_ACCESS_TOKEN }}
           secrets: KEY
 
       - name: Print Outputs
