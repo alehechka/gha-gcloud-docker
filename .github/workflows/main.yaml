@@ -1,0 +1,22 @@
+name: Test gha-gcloud-docker
+on:
+  - push
+
+jobs:
+  secret_manager:
+    runs-on: ubuntu-latest
+    name: Test gha-gcloud-docker
+    steps:
+      - name: Test gha-gcloud-docker
+        id: secrets
+        uses: alehechka/gha-gcloud-docker@feature/create
+        with:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GHA_ACCESS_USER: ${{ secrets.GHA_ACCESS_USER }}
+          GHA_ACCESS_TOKEN: ${{ secrets.GHA_ACCESS_TOKEN }}
+          secrets: KEY
+
+      - name: Print Outputs
+        if: always()
+        run: |
+          echo "KEY=${{ steps.secrets.outputs.KEY }}"
