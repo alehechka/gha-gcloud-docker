@@ -53,7 +53,7 @@ function env_prefixer() {
 
     if [[ "$GITHUB_REF_TYPE" = 'branch' ]] && ([[ "$REF" = 'main' ]] || [[ "$REF" =~ $RELEASE_REGEX ]]); then
         echo "$PROD"
-    elif [[ "$GITHUB_REF_TYPE" = 'tag' ]] && [[ "$REF" =~ $SEMVER_REGEX ]] && [[ $(get_tag_parent $REF) ]]; then
+    elif [[ "$GITHUB_REF_TYPE" = 'tag' ]] && [[ "$REF" =~ $SEMVER_REGEX ]] && [[ $(get_tag_parent $REF) = 'true' ]]; then
         echo "TAG"
     else
         echo "$DEVELOP"
@@ -76,9 +76,9 @@ function get_tag_parent() {
     git fetch origin "refs/tags/$TAG"
 
     if [[ $(git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)") ]]; then
-        return 0 # true
+        echo "true"
     else 
-        return 1 # false
+        echo "false"
     fi
 }
 
