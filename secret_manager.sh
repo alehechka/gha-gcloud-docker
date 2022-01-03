@@ -1,14 +1,11 @@
 #!/bin/bash
 
 function main() {
-    GCP_SA_KEY=$1
-    KEYS=$2
-
     env | sort
 
-    gcloud_auth "$GCP_SA_KEY" 
+    gcloud_auth "$INPUT_GCP_SA_KEY" 
 
-    get_secrets "$KEYS"
+    get_secrets "$INPUT_SECRETS"
 }
 
 function gcloud_auth() {
@@ -24,7 +21,6 @@ function gcloud_auth() {
 function get_secrets() {
     KEYS=$1
     PREFIX=$(env_prefixer "$GITHUB_ACTION_REF" "$GITHUB_REF_TYPE")
-    echo "$PREFIX"
 
     echo "Retrieving secrets from Secret Manager..."
     for KEY in ${KEYS//,/ }
@@ -45,22 +41,50 @@ function get_secrets() {
 }
 
 function env_prefixer() {
-    REF=$1
-    REF_TYPE=$2
+    REF=$(get_ref)
 
     PROD="PROD_"
     DEVELOP="DEVELOP_"
 
     # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     # Semver official doesn't work with Bash, used this modified version: https://gist.github.com/rverst/1f0b97da3cbeb7d93f4986df6e8e5695#gistcomment-3029858
-    SEMVER_REGEX="^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$"
+    SEMVER_REGEX="^(v*0|v*[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9][0-9]*|[0-9]*[a-zA-Z-][0-9a-zA-Z-]*))*))?(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*))?$"
+    RELEASE_REGEX="release/*"
 
-    if [ "$REF" = 'main' ]; then
+    if [[ "$GITHUB_REF_TYPE" = 'branch' ]] && ([[ "$REF" = 'main' ]] || [[ "$REF" =~ $RELEASE_REGEX ]]); then
         echo "$PROD"
-    elif [[ "$REF_TYPE" = 'tag' ]] && [[ "$REF" =~ $SEMVER_REGEX ]]; then
+    elif [[ "$GITHUB_REF_TYPE" = 'tag' ]] && [[ "$REF" =~ $SEMVER_REGEX ]] && [[ $(get_tag_parent $REF) ]]; then
         echo "TAG"
     else
         echo "$DEVELOP"
+    fi
+}
+
+function get_tag_parent() {
+    TAG=$1
+
+    GIT_REPO_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+
+    if [ -n "$INPUT_GHA_ACCESS_USER" ] && [ -n "$INPUT_GHA_ACCESS_TOKEN" ]; then 
+        git config --global url."https://$INPUT_GHA_ACCESS_USER:$INPUT_GHA_ACCESS_TOKEN@github.com".insteadOf "https://github.com"
+    fi
+
+    git clone "$GIT_REPO_URL"
+
+    git fetch origin "refs/tags/$TAG"
+
+    if [ $(git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)") ]; then
+        return 0 # true
+    else 
+        return 1 # false
+    fi
+}
+
+function get_ref() {
+    if [[ "$GITHUB_EVENT_NAME" == 'pull_request' ]]; then
+        echo "$GITHUB_HEAD_REF"
+    else
+        echo "$GITHUB_REF_NAME"
     fi
 }
 
