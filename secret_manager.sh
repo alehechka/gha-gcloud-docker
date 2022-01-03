@@ -71,6 +71,8 @@ function get_tag_parent() {
 
     git clone "$GIT_REPO_URL"
 
+    cd ${GITHUB_REPOSITORY##*/}
+
     git fetch origin "refs/tags/$TAG"
 
     if [ $(git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)") ]; then
