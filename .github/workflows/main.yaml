@@ -12,10 +12,9 @@ jobs:
         uses: alehechka/gha-gcloud-docker@feature/create
         with:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-          secrets: DEVELOP_KEY, PROD_KEY
+          secrets: KEY
 
       - name: Print Outputs
         if: always()
         run: |
-          echo "DEVELOP_KEY=${{ steps.secrets.outputs.DEVELOP_KEY }}"
-          echo "PROD_KEY=${{ steps.secrets.outputs.PROD_KEY }}"
+          echo "KEY=${{ steps.secrets.outputs.KEY }}"
