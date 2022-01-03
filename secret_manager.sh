@@ -7,8 +7,11 @@ function main() {
 
     # get_secrets "$INPUT_SECRETS"
 
-    value=$(get_tag_parent "v0.0.3")
-    echo "value: $value"
+    if [ $(get_tag_parent "v0.0.3") ]; then
+        echo "true"
+    else
+        echo "false"
+    fi
 }
 
 function gcloud_auth() {
@@ -90,10 +93,8 @@ function get_tag_parent() {
     git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)"
 
     if [ $(git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)") ]; then
-        echo "true"
         return 0 # true
     else 
-        echo "false"
         return 1 # false
     fi
 }
