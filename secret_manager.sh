@@ -3,9 +3,12 @@
 function main() {
     env | sort
 
-    gcloud_auth "$INPUT_GCP_SA_KEY" 
+    # gcloud_auth "$INPUT_GCP_SA_KEY" 
 
-    get_secrets "$INPUT_SECRETS"
+    # get_secrets "$INPUT_SECRETS"
+
+    value=$(get_tag_parent "v0.0.3")
+    echo "value: $value"
 }
 
 function gcloud_auth() {
@@ -69,15 +72,28 @@ function get_tag_parent() {
         git config --global url."https://$INPUT_GHA_ACCESS_USER:$INPUT_GHA_ACCESS_TOKEN@github.com".insteadOf "https://github.com"
     fi
 
+    echo "cloning repo"
     git clone "$GIT_REPO_URL"
 
     cd ${GITHUB_REPOSITORY##*/}
 
+    echo "fetching tag: $TAG"
     git fetch origin "refs/tags/$TAG"
 
+    echo "checking tagged commit"
+    git rev-list -n 1 tags/$TAG
+
+    echo "checking which remote branches contain commit"
+    git branch -r --contains $(git rev-list -n 1 tags/$TAG)
+
+    echo "same as above but grepped"
+    git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)"
+
     if [ $(git branch -r --contains $(git rev-list -n 1 tags/$TAG) | egrep "origin/(main|release/*)") ]; then
+        echo "true"
         return 0 # true
     else 
+        echo "false"
         return 1 # false
     fi
 }
