@@ -54,7 +54,7 @@ function env_prefixer() {
     if [[ "$GITHUB_REF_TYPE" = 'branch' ]] && ([[ "$REF" = 'main' ]] || [[ "$REF" =~ $RELEASE_REGEX ]]); then
         echo "$PROD"
     elif [[ "$GITHUB_REF_TYPE" = 'tag' ]] && [[ "$REF" =~ $SEMVER_REGEX ]] && [[ $(get_tag_parent $REF) = 'true' ]]; then
-        echo "TAG"
+        echo "$PROD"
     else
         echo "$DEVELOP"
     fi
