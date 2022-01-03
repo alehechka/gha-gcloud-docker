@@ -6,8 +6,7 @@ KEYS=$2
 echo "Authenticating Service Account with gcloud..."
 mkdir -p /tmp/certs
 echo "$GCP_SA_KEY" > /tmp/certs/svc_account.json
-# --project $(cat /tmp/certs/svc_account.json | jq -r '.project_id')
-gcloud auth activate-service-account --key-file=/tmp/certs/svc_account.json --no-user-output-enabled
+gcloud auth activate-service-account --key-file=/tmp/certs/svc_account.json --project $(echo "$GCP_SA_KEY" | jq -r '.project_id') --no-user-output-enabled
 
 echo "Retrieving secrets from Secret Manager..."
 for KEY in ${KEYS//,/ }
