@@ -1,0 +1,28 @@
+name: Release gha-gcloud-docker
+on:
+  push:
+    branches:
+      - 'release/*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Release gha-gcloud-docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Output branch tag
+        id: name
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/release/}"
+
+      - name: Release
+        # Equivalent to satackey/push-prebuilt-action@v0.1.1
+        uses: satackey/push-prebuilt-action@265e6956c004ad224714ed47d583fc474ac71cc8
+        with:
+          push-branch: release-${{ steps.name.outputs.branch }}
+          release-tags: ${{ steps.name.outputs.branch }}
+          docker-registry: ghcr.io
+          docker-user: alehechka
+          docker-token: ${{ secrets.GITHUB_TOKEN }}
+          docker-repotag: ${{ github.repository }}:${{ github.sha }}
