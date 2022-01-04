@@ -29,9 +29,6 @@ jobs:
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY_HOSTNAME }} -u ${{ github.actor }} --password-stdin
 
-      - name: Build Docker Image
-        run: docker push ${{ steps.build_image.outputs.tag }}
-
       - name: Check action image
         id: action-image
         run: |
