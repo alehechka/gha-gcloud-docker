@@ -4,6 +4,9 @@ on:
     branches:
       - 'release/*'
 
+env:
+  REGISTRY_HOSTNAME: ghcr.io
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -13,16 +16,38 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Output branch tag
-        id: name
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/release/}"
+        id: tag # use as ${{ steps.tag.outputs.name }}
+        run: echo "::set-output name=name::${GITHUB_REF#refs/heads/release/}"
 
-      - name: Release
-        # Equivalent to satackey/push-prebuilt-action@v0.1.1
-        uses: satackey/push-prebuilt-action@265e6956c004ad224714ed47d583fc474ac71cc8
-        with:
-          push-branch: release-${{ steps.name.outputs.branch }}
-          release-tags: ${{ steps.name.outputs.branch }}
-          docker-registry: ghcr.io
-          docker-user: alehechka
-          docker-token: ${{ secrets.GITHUB_TOKEN }}
-          docker-repotag: ${{ github.repository }}:${{ github.sha }}
+      - name: Output build image
+        id: build_image # use as ${{ steps.build_image.outputs.tag }}
+        run: echo "::set-output name=tag::${{ env.REGISTRY_HOSTNAME }}/${{ github.repository }}:${{ steps.tag.outputs.name }}"
+
+      - name: Build Docker Image
+        run: docker build -t ${{ steps.build_image.outputs.tag }} .
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY_HOSTNAME }} -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker Image
+        run: docker push ${{ steps.build_image.outputs.tag }}
+
+      - name: Check action image
+        id: action-image
+        run: |
+          if [[ $(yq e '.runs.image' action.yaml) = "${{ steps.build_image.outputs.tag }}" ]]; then
+            echo "::set-output name=is-set::true"
+          fi
+
+      - name: Update action image
+        if: steps.action-image.outputs.is-set != 'true'
+        run: yq e -i '.runs.image = "${{ steps.build_image.outputs.tag }}"' action.yaml
+
+      - name: Add and Commit
+        if: steps.action-image.outputs.is-set != 'true'
+        uses: EndBug/add-and-commit@v7
+
+      - name: Create and Push Git Tag
+        run: |
+          git tag ${{ steps.tag.outputs.name }}
+          git push origin -f --tags

@@ -1,6 +1,8 @@
 name: Test gha-gcloud-docker
 on:
-  - push
+  push:
+    branches-ignore:
+      - 'release/*'
 
 jobs:
   secret_manager:
