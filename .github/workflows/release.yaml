@@ -52,5 +52,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-          git tag -f -a ${{ steps.tag.outputs.name }}
+          git tag -f -a ${{ steps.tag.outputs.name }} -m "[ci skip]"
           git push origin -f --tags
