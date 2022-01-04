@@ -29,6 +29,9 @@ jobs:
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY_HOSTNAME }} -u ${{ github.actor }} --password-stdin
 
+      - name: Publish Docker Image
+        run: docker push ${{ steps.build_image.outputs.tag }}
+
       - name: Check action image
         id: action-image
         run: |
@@ -46,8 +49,8 @@ jobs:
 
       - name: Create and Push Git Tag
         run: |
-          git config user.email ${{ github.actor }}
-          git config user.name ${{ github.repository_owner }}
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
 
           git tag -f -a ${{ steps.tag.outputs.name }}
           git push origin -f --tags
