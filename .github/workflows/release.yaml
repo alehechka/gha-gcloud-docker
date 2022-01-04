@@ -32,13 +32,13 @@ jobs:
       - name: Check action image
         id: action-image
         run: |
-          if [[ $(yq e '.runs.image' action.yaml) = "${{ steps.build_image.outputs.tag }}" ]]; then
+          if [[ $(yq e '.runs.image' action.yaml) = "docker://${{ steps.build_image.outputs.tag }}" ]]; then
             echo "::set-output name=is-set::true"
           fi
 
       - name: Update action image
         if: steps.action-image.outputs.is-set != 'true'
-        run: yq e -i '.runs.image = "${{ steps.build_image.outputs.tag }}"' action.yaml
+        run: yq e -i '.runs.image = "docker://${{ steps.build_image.outputs.tag }}"' action.yaml
 
       - name: Add and Commit
         if: steps.action-image.outputs.is-set != 'true'
