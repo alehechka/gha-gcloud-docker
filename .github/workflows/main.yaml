@@ -12,9 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Test gha-gcloud-docker
     steps:
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GHA_ACCESS_TOKEN }}" | docker login ${{ env.REGISTRY_HOSTNAME }} -u ${{ secrets.GHA_ACCESS_USER }} --password-stdin
-
       - name: Test gha-gcloud-docker
         id: secrets
         uses: alehechka/gha-gcloud-docker@feature/resolve-docker
