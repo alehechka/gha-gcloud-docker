@@ -46,5 +46,8 @@ jobs:
 
       - name: Create and Push Git Tag
         run: |
+          git config user.email ${{ github.actor }}
+          git config user.name ${{ github.repository_owner }}
+
           git tag -f -a ${{ steps.tag.outputs.name }}
           git push origin -f --tags
