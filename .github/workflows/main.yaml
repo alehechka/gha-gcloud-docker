@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Test gha-gcloud-docker
         id: secrets
-        uses: alehechka/gha-gcloud-docker@feature/create
+        uses: alehechka/gha-gcloud-docker@v1
         with:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           GHA_ACCESS_USER: ${{ secrets.GHA_ACCESS_USER }}
